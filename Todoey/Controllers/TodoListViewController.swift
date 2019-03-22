@@ -10,14 +10,27 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     
-    var itemArray = ["Find Mike", "Buy Egges", "Destory Demogogron"]
+    var itemArray = [Item]()
     
     let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+        
+        let newItem = Item()
+        newItem.title = "Купить молоко"
+        itemArray.append(newItem)
+        
+        let newItem2 = Item()
+        newItem2.title = "Cделать уборку"
+        itemArray.append(newItem2)
+        
+        let newItem3 = Item()
+        newItem3.title = "Позвонить маме"
+        itemArray.append(newItem3)
+        
+        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
             
             itemArray = items
         }
@@ -37,7 +50,12 @@ class TodoListViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        let item = itemArray[indexPath.row]
+        
+        cell.textLabel?.text = item.title
+        
+        cell.accessoryType = item.done ? .checkmark: .none
+        
         
         return cell
     }
@@ -47,12 +65,10 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         //print(itemArray[indexPath.row])
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-           tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-           tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
         
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -73,7 +89,12 @@ class TodoListViewController: UITableViewController {
             
             // добалвяем в массив itemArray новый item, вносимый пользователем
            
-            self.itemArray.append(textField.text!)
+            
+            let newItem = Item()
+            newItem.title = textField.text!
+            
+            
+            self.itemArray.append(newItem)
             
             self.defaults.set(self.itemArray, forKey: "TodoListArray")
             
